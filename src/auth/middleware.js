@@ -1,6 +1,7 @@
 'use strict';
 
 import User from './model.js';
+//import Chores from './chores_model.js';
 
 export default (req, res, next) => {
 

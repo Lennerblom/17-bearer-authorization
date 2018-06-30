@@ -32,7 +32,7 @@ userSchema.statics.authenticate = function(auth) {
 };
 
 userSchema.statics.authorize = function(token) {
-  let parsedToken = jwt.verify(token, process.env.SECRET || 'changeit');
+  let parsedToken = jwt.verify(token, process.env.APP_SECRET || 'changeit');
   let query = {_id:parsedToken.id};
   return this.findOne(query)
     .then(user => {
@@ -40,7 +40,7 @@ userSchema.statics.authorize = function(token) {
       return user;
     })
     .catch(error => error);
-}
+};
 
 // Compare a plain text password against the hashed one we have saved
 userSchema.methods.comparePassword = function(password) {

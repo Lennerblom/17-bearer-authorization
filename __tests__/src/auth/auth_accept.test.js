@@ -1,62 +1,51 @@
 'use strict';
 
-jest.mock('../../../src/auth/model.js');
+const superagent = require('superagent');
+const mongoose = require('mongoose');
+const app = require('../../../src/app.js');
 
-import auth from '../../../src/auth/middleware.js';
+describe('Authentication Server', () => {
 
-describe('Auth Middleware', () => {
-
-  let errorNext = jest.fn();
-  let errorObject =  {message:'Invalid User ID/Password', status: 401, statusMessage:'Unauthorized'};
-
-  it('throws an error if no authorization header present', () => {
-
-    let req = {headers:{}};
-    let res = {};
-    auth(req,res,errorNext);
-    expect(errorNext).toHaveBeenCalledWith(errorObject);
+  const PORT = 8888;
+  beforeAll( () => {
+    mongoose.connect('mongodb://localhost:27017/baseball');
+    app.start(PORT);
+  });
+  afterAll( () => {
+    app.stop();
+    mongoose.connection.close();
   });
 
-  it('returns an error when username and password are both not present', () => {
-    let user = '';
-    let pass = '';
-    let code = btoa(`${user}:${pass}`);
-    let req = {headers:{authorization:`Basic ${code}`}};
-    let res = {};
-    auth(req,res,errorNext);
-    expect(errorNext).toHaveBeenCalledWith(errorObject);
+  // Note that these will actually be using the mocked models
+  // from the mock version of require-dir.  IOW .. no need to spin up
+  // a mongo server to run these tests. (we don't want to test mongo anyway!)
+
+  it('gets a 401 on a bad login', () => {
+    return superagent.get('http://localhost:8888/signin')
+      .then(response => {
+      })
+      .catch(response => {
+        expect(response.status).toEqual(401);
+      });
   });
 
-  it('returns an error when the username is not present', () => {
-    let user = '';
-    let pass = 'somepass';
-    let code = btoa(`${user}:${pass}`);
-    let req = {headers:{authorization:`Basic ${code}`}};
-    let res = {};
-    auth(req,res,errorNext);
-    expect(errorNext).toHaveBeenCalledWith(errorObject);
+  it('gets a 401 on a bad login', () => {
+    return superagent.get('http://localhost:8888/signin')
+      .auth('foo','bar')
+      .then(response => {
+      })
+      .catch(response => {
+        expect(response.status).toEqual(401);
+      });
   });
 
-  it('returns an error when the password is not present', () => {
-    let user = 'someuser';
-    let pass = '';
-    let code = btoa(`${user}:${pass}`);
-    let req = {headers:{authorization:`Basic ${code}`}};
-    let res = {};
-    auth(req,res,errorNext);
-    expect(errorNext).toHaveBeenCalledWith(errorObject);
+  it('gets a 200 on a good login', () => {
+    return superagent.get('http://localhost:3017/signin')
+      .auth('john','foobar')
+      .then(response => {
+        expect(response.statusCode).toEqual(200);
+      })
+      .catch(console.err);
   });
 
-  it('passes on a token when a username and password are present', (done) => {
-    let user = 'someuser';
-    let pass = 'somepass';
-    let code = btoa(`${user}:${pass}`);
-    let req = {headers:{authorization:`Basic ${code}`}};
-    let res = {};
-    let next = () => {
-      expect(req.token).toEqual('token!');
-      done();
-    };
-    auth(req,res,next);
-  });
 });
