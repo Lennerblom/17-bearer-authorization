@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Lennerblom/17-bearer-authorization.svg?branch=master)](https://travis-ci.org/Lennerblom/17-bearer-authorization)
 # 17 Bearer Authorization
 ___
 ###### TRAVIS: https://travis-ci.org/Lennerblom/17-bearer-authorization
