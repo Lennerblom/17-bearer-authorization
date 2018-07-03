@@ -2,9 +2,9 @@
 
 import mongoose, {Schema} from 'mongoose';
 
-const ChoreSchema = new Schema ({
+const ChoresSchema = new Schema ({
   choreName: {type: String},
   assignedTo: {type: String, required: true},
 });
 
-export default mongoose.model('Chore', ChoreSchema);
+export default mongoose.model('Chores', ChoresSchema);
